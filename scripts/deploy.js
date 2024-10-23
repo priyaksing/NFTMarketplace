@@ -1,22 +1,17 @@
-const { ethers } = require("hardhat");
 const hre = require("hardhat");
-const fs = require("fs");
+
+// Contract deployed at :  0x043f8927126D494ddAc7fd55162f08c360c02B05
 
 async function main() {
-  const [deployer] = await ethers.getSigners();
-  const balance = await deployer.getBalance();
-  const Marketplace = await hre.ethers.getContractFactory("NFTMarketplace");
-  const marketplace = await Marketplace.deploy();
 
-  await marketplace.deployed();
+  const [deployer] = await hre.ethers.getSigners();
+  const balance = await deployer.provider.getBalance(deployer.address);
 
-  const data = {
-    address: marketplace.address,
-    abi: JSON.parse(marketplace.interface.format('json'))
-  }
+  const NFTMarketplace = await hre.ethers.getContractFactory("NFTMarketplace");
+  const nftmarketplace = await NFTMarketplace.deploy();
+  await nftmarketplace.waitForDeployment();
 
-  //This writes the ABI and address to the mktplace.json
-  fs.writeFileSync('./src/Marketplace.json', JSON.stringify(data))
+  console.log("Contract deployed at : ", await nftmarketplace.getAddress())
 }
 
 main()
